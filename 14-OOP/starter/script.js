@@ -208,19 +208,16 @@ console.log(ford);
 When a function is called with new keyword to create an instance of an object 'this' refers to newly created instance.*/
 
 // Challenge 3
-const Car = function (make, speed, charge) {
+const Car = function (make, speed) {
   this.make = make;
   this.speed = speed;
+};
+const EV = function (make, speed, charge) {
+  Car.call(this, make, speed);
   this.charge = charge;
 };
-
+//Linking Prototypes
 EV.prototype = Object.create(Car.prototype);
-const EV = function (make, speed, charge) {
-  Car.call(this, make, speed, charge);
-  // this.make = make;
-  // this.speed = speed;
-  // this.charge = charge;
-};
 EV.prototype.chargeBattery = function () {
   return `chargeT0`;
 };
@@ -235,4 +232,6 @@ EV.prototype.accelerate = function () {
     `${this.make} going at ${this.speed}km/h, with charge of ${this.charge}%`
   );
 };
+
 const ev = new EV('honda', 120, 88);
+console.dir(ev);
