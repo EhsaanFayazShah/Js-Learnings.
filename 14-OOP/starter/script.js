@@ -109,12 +109,12 @@ car1.brake();
 car2.brake();
 car2.accelerate();
 */
-/*
+
 // 🎇ES6 Classes
 // 1. Classes are NOT hoisted
 // 2. Classes are first- Class Citizens(they can be passed and returned by the functions)
 // 3. Classes are executed in strict mode even if not activated.
-
+/*
 class PersonCl {
   constructor(fullName, birthYear) {
     this.fullName = fullName;
@@ -141,6 +141,7 @@ class PersonCl {
     return new PersonCl(fullName, birthYear);
   }
 }
+/*
 const ehsaan = new PersonCl('Ehsaan Shah', 2002);
 const shahie = new PersonCl('Shahie Rashid', 1988);
 // console.log(ehsaan, shahie);
@@ -193,6 +194,7 @@ class CarCl {
     this.speed = speed * 1.6;
   }
 }
+/*
 const ford = new CarCl('Ford', 120);
 const car2 = new CarCl('Mercedes', 95);
 
@@ -206,7 +208,7 @@ console.log(ford);
 // Inheritance using constructor functions
 /*
 When a function is called with new keyword to create an instance of an object 'this' refers to newly created instance.*/
-
+/*
 // Challenge 3
 const Car = function (make, speed) {
   this.make = make;
@@ -218,12 +220,16 @@ const EV = function (make, speed, charge) {
 };
 //Linking Prototypes
 EV.prototype = Object.create(Car.prototype);
-EV.prototype.chargeBattery = function () {
-  return `chargeT0`;
+EV.prototype.chargeBattery = function (chargeTo) {
+  this.charge = chargeTo;
 };
-EV.prototype.brake = function () {
-  this.speed -= 10;
+Car.prototype.accelerate = function () {
+  this.speed += 10;
   console.log(`${this.make} going at ${this.speed}km/h`);
+};
+Car.prototype.brake = function () {
+  this.speed -= 10;
+  console.log(`${this.make} going at ${this.speed}km/h `);
 };
 EV.prototype.accelerate = function () {
   this.speed += 20;
@@ -233,5 +239,120 @@ EV.prototype.accelerate = function () {
   );
 };
 
-const ev = new EV('honda', 120, 88);
-console.dir(ev);
+const ev1 = new EV('Tesla', 120, 23);
+ev1.accelerate();
+ev1.brake();
+ev1.chargeBattery(90);
+ev1.accelerate();
+*/
+/*
+// Es6 Classes using Extend keyword
+class StudentCl extends PersonCl {
+  constructor(fullName, birthYear, course) {
+    super(fullName, birthYear);
+    this.course = course;
+  }
+  calcAge() {
+    console.log(this.age + 10);
+  }
+}
+const Malik = new StudentCl('Malik Shahzab', 2012, 'Medical');
+Malik.calcAge();
+console.log(Malik.fullName);
+*/
+/*
+class jkbank {
+  // Private Fields
+  // Implementing Encapsulation by hiding the important data fields.
+  #Pin;
+  #residence = navigator.language;
+  #movements = [];
+
+  constructor(owner, Pin, currency) {
+    this.owner = owner;
+    this.currency = currency;
+    this.#Pin = Pin;
+  }
+  //Public Methods
+  getMovements() {
+    return this.#movements;
+  }
+  deposit(val) {
+    this.#movements.push(val);
+    return this;
+  }
+  approveLoan() {
+    return this.#movements.length == 0 ? false : true;
+  }
+  withdraw(val) {
+    this.#movements.push(-val);
+    return this;
+  }
+  requestLoan(val) {
+    if (this.approveLoan()) {
+      this.deposit(val);
+      console.log('Loan is Approved');
+      return this;
+    }
+  }
+  static helper() {
+    console.log('helper');
+  }
+}
+// const own1 = new jkbank('basit', 'lal ', 190023, 400, 'IND');
+const own1 = new jkbank('basit', 190023, 'IND');
+own1.deposit(300);
+own1.withdraw(100);
+own1.requestLoan(10000);
+console.log(own1);
+// console.log(own1.#movements);
+// console.log(own1.#Pin);   //Cannot be accessed becz of private fields
+// console.log(own1.#residence);
+own1.deposit(200).deposit(300).withdraw(88).requestLoan(24000).withdraw(3000);
+console.log(own1);
+own1.prototype = jkbank.prototype.constructor;
+console.dir(own1.__proto__);
+console.log(own1.getMovements());
+console.log(own1);
+console.dir(own1.__proto__);
+*/
+class CarCl {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  brake() {
+    this.speed -= 10;
+    console.log(`${this.make} going at ${this.speed}km/h`);
+    return this; //return the current object that is calling the function.(for Chaining Methods)
+  }
+  get speedUS() {
+    return this.speed / 1.6;
+  }
+  set speedUS(speed) {
+    this.speed = speed * 1.6;
+  }
+}
+class EVCl extends CarCl {
+  #charge;
+  constructor(make, speed, charge) {
+    super(make, speed);
+    this.#charge = charge;
+  }
+  chargeBattery(chargeTo) {
+    this.#charge = chargeTo;
+    return this;
+  }
+  accelerate() {
+    this.speed += 20;
+    this.#charge--;
+    console.log(
+      `${this.make} going at ${this.speed}km/h, with charge of ${this.#charge}%`
+    );
+    return this;
+  }
+}
+const rivian = new EVCl('Rivian', 120, 23);
+rivian.accelerate().chargeBattery(50).brake().accelerate().brake();
+console.log(rivian.speedUS);
