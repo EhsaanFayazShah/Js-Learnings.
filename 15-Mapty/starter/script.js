@@ -6,6 +6,7 @@ class Workout {
   // public Property fields
   date = new Date();
   id = (Date.now() + '').slice(-10);
+  clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords;
@@ -19,6 +20,10 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
+  }
+
+  click() {
+    this.clicks++;
   }
 }
 
@@ -65,14 +70,19 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
+  #mapZoomLevel = 13;
   #map;
   #mapEvent;
-  #workouts = [];
+  #workouts = []; //workout array.(Array of Objects)
 
   constructor() {
     this._getPosition();
+
+    //get local storage
+    this._getLocalStorage();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -100,7 +110,7 @@ class App {
     // console.log(coords);
 
     // Initialize the map and set its view to the user's coordinates
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     // Add a tile layer to the map
     L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -111,6 +121,10 @@ class App {
     //Handling clicks on map
     // Bind 'this' context to _showForm method for handling map clicks
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -159,7 +173,7 @@ class App {
     // !Number.isFinite(distance) ||
     // !Number.isFinite(duration) ||
     // !Number.isFinite(cadence)
-    console.log(type);
+    // console.log(type);
     if (type === 'running') {
       const cadence = +inputCadence.value;
 
@@ -197,6 +211,9 @@ class App {
 
     //Hide the form & Clear all input fields
     this._hideForm();
+
+    //Set local storage
+    this._setLocalStorage();
 
     //Display the Marker
     // console.log(mapEvent);
@@ -266,6 +283,54 @@ class App {
     }
     form.insertAdjacentHTML('afterend', html);
   }
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+    // console.log(workoutEl);
+    if (!workoutEl) return; //Guard Clause used
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    // console.log(workout);
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+    //using the public interface
+    workout.click();
+    // console.log(workout);
+  }
+  // local storage is nothing but the key value pairs
+  // ..Local storage is blocking & not to use to store large amount of data.
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    console.log(data);
+
+    if (!data) return;
+    this.#workouts = data;
+
+    // this.#workouts.forEach(work => {
+    //   this._renderWorkoutMarker(work);
+    // });
+
+    // above commented code does not work bcz the map is loaded before it gets rendered again  (async)
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
+  }
 }
 
 const app = new App();
+// app.reset(); //try only in the console.
