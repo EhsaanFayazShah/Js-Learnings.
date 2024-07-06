@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
@@ -75,6 +75,7 @@ const renderCountry = function (data, className = '') {
 // So to tackle that we use Promises
 
 //this below method will return json only when the response for that particular country is found
+
 const getJSON = function (url, errorMsg = 'Something Went wrong ') {
   return fetch(url).then(response => {
     if (!response.ok) throw new Error(`${errorMsg} ${response.status}`);
@@ -117,9 +118,76 @@ btn.addEventListener('click', function () {
 // const getCountry(lat,lng){
 
 // }
-const getCountryData = function () {
-  const data = fetch('https://geocode.xyz/52.508,13.381?geoit=json');
-  console.log(data);
+
+//Challenge 1
+/*
+const renderCountry = function (data, className = '') {
+  // console.log(data);
+  // const language = Object.keys(data.languages);
+  // const currency = Object.keys(data.currencies);
+  const html = `
+  <article class="country ${className}">
+          <img class="country__img" src="./img/img-1.jpg" />
+          <div class="country__data"> 
+            <h3 class="country__name">${data.country}</h3>
+            <h4 class="country__region">${data.state}</h4>
+            <h4 class="country__region">${data.city}</h4>
+            <p class="country__row"><span>👫</span>${data.postal}</p>
+            <p class="country__row"><span>🗣️</span>${data.class}</p>
+            <p class="country__row"><span>💰</span>
+           
+               ${data.timezone}
+    </p>   
+            </div>
+            </article>`;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
 };
 
-getCountryData();
+const whereAmI = function (lat, lng) {
+  // const data = fetch(
+  //   `https://api.bigdatacloud.net/data/reverse-geocode-client?${lat}&${lng}&localityLanguage=en`
+  // )
+  const data = fetch(
+    `https://geocode.xyz/${lat},${lng}?geoit=json&auth=	251834749864577934507x125842`
+  )
+    .then(response => {
+      if (!response.ok) throw new Error(`not found, ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (!data) throw new Error(`cannot found, ${data.status}`);
+      console.log(data);
+
+      console.log(`You are in ${data.city}, ${data.country}`);
+      renderCountry(data);
+    })
+    .catch(err => {
+      prompt('Data Not found', err.message);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+      console.log('Thank You for visiting');
+    });
+};
+// “You are in Berlin, Germany”
+// whereAmI(34.13232449177568, 74.83038748465819);
+btn.addEventListener('click', function () {});
+whereAmI(34.13232449177568, 74.83038748465819);
+whereAmI(50.85415323892241, 4.204419612888511);
+*/
+
+// Promises Resolve
+console.log('Test Start');
+setTimeout(() => {
+  console.log('timer hit.');
+}, 0);
+Promise.resolve('Resolved 1').then(res => {
+  console.log(res);
+});
+Promise.resolve('Resolved 2').then(res => {
+  for (let i = 0; i < 1000000; i++);
+  console.log(res);
+});
+
+console.log('Test End');
+//we dont recommend to use timeres for doing some of the sensitive tasks. Bcz they have the lower priority.
