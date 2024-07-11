@@ -1,11 +1,11 @@
 'use strict';
 
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
-const renderError = function (errMsg) {
-  countriesContainer.insertAdjacentText('beforeend', errMsg);
-  // countriesContainer.style.opacity = 1;
-};
+// const btn = document.querySelector('.btn-country');
+// const countriesContainer = document.querySelector('.countries');
+// const renderError = function (errMsg) {
+//   countriesContainer.insertAdjacentText('beforeend', errMsg);
+//   // countriesContainer.style.opacity = 1;
+// };
 ///////////////////////////////////////
 /*
 const renderCountry = function (data, className = '') {
@@ -120,7 +120,7 @@ btn.addEventListener('click', function () {
 
 // }
 
-//Challenge 1
+//Challenge 1 🧨🧨🧨🧨🧨🧨🧨🧨
 /*
 const renderCountry = function (data, className = '') {
   // console.log(data);
@@ -177,7 +177,7 @@ whereAmI(34.13232449177568, 74.83038748465819);
 whereAmI(50.85415323892241, 4.204419612888511);
 */
 /*
-// Promises Resolve
+// 🧨🧨Promises Resolve🧨🧨
 console.log('Test Start');
 setTimeout(() => {
   console.log('timer hit.');
@@ -197,7 +197,7 @@ console.log('Test End');
 //we dont recommend to use timeres for doing some of the sensitive tasks. Bcz they have the lower priority.
 */
 /*
-//executor function.
+//🧨🧨executor function.🧨🧨
 const lotteryPromise = new Promise((resolve, reject) => {
   console.log('Lottery Is Being Processed');
   setTimeout(() => {
@@ -217,7 +217,7 @@ lotteryPromise
   });
   */
 /*
-//Promisfying setTimeout.
+//🧨🧨Promisfying setTimeout.🧨🧨
 const wait = function (seconds) {
   return new Promise(resolve => {
     setTimeout(resolve, 1000 * seconds);
@@ -258,7 +258,7 @@ wait(2)
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject('Problem!').catch(x => console.error(x));
 */
-
+// 🧨🧨🧨🧨Challenge 2🧨🧨🧨🧨
 // const renderCountry = function (data, className = '') {
 //   const html = `
 //   <article class="country ${className}">
@@ -320,6 +320,7 @@ Promise.reject('Problem!').catch(x => console.error(x));
 //     .catch(err => console.error(`${err} 💥`));
 // };
 // btn.addEventListener('click', whereAmI);
+/*
 const renderCountry = function (data, className = '') {
   const html = `
   <article class="country ${className}">
@@ -389,3 +390,251 @@ const whereAmI = function () {
 };
 
 btn.addEventListener('click', whereAmI);
+*/
+/*
+let currentImg;
+const wait = function (seconds) {
+  return new Promise(resolve => {
+    setTimeout(resolve, 1000 * seconds);
+  });
+};
+
+let img;
+function createImage(imgPath) {
+  return new Promise((resolve, reject) => {
+    img = document.createElement('img');
+    img.src = imgPath;
+
+    img.onload = () => {
+      document.querySelector('.images').appendChild(img);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+    };
+  });
+}
+// Example usage:🧨🧨
+createImage('./img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image loaded successfully:', currentImg);
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('./img/img-2.jpg');
+  })
+  .then(() => {
+    currentImg = img;
+    console.log('Image 2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(error => {
+    console.error('Error loading image:', error);
+  });
+*/
+// 🧨🧨🧨Asyn/Await 🧨🧨🧨
+// https://restcountries.com/v3.1/name/${countryName}
+/*
+
+const renderCountry = function (data, className = '') {
+  const html = `
+    <article class="country ${className}">
+      <img class="country__img" src="${data.flags.png}" />
+      <div class="country__data">
+        <h3 class="country__name">${data.name.common}</h3>
+        <h4 class="country__region">${data.region}</h4>
+        <p class="country__row"><span>👫</span>${(
+          +data.population / 1000000
+        ).toFixed(1)} Million people</p>
+        <p class="country__row"><span>🗣️</span>${data.languages.urd}</p>
+        <p class="country__row"><span>💰</span>${data.currencies.PKR.name}</p>
+      </div>
+    </article>
+    `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+// position => resolve(position),
+// err => reject(err)
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+const whereAmI = async function (countryName) {
+  try {
+    const pos = await getPosition();
+    let { latitude: lat, longitude: lng } = pos.coords;
+    const resGeo = await fetch(
+      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=251834749864577934507x125842`
+    );
+    if (!resGeo) throw new Error('Not able to get location Data');
+    const dataGeo = await resGeo.json();
+    // console.log(dataGeo);
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${countryName}`
+    );
+    if (!res) throw new Error('Not able to get Country Data');
+    // console.log(res);
+    const data = await res.json();
+    // console.log(data[0]);
+    renderCountry(data[0]);
+    return `You are  in the ${data[0].name.common}`;
+  } catch (err) {
+    renderError(`🎇 ${err.message}`);
+
+    //Reject the Promise returned from the async function
+    throw err;
+  }
+};
+console.log(`1: will get the location`);
+// const city = whereAmI('pakistan'); //here the fulfilled promise is returned. bcz of async function.
+// console.log(city);
+/*
+//Traditional way of handling a Promise using then clause
+whereAmI('pakistan')
+  .then(city => {})
+  .catch(err => {
+    console.error(`2.${err.message}`);
+  })
+  .finally(() => {
+    console.log(`3: finished execution`);
+  });
+*/
+/*
+//the above code can be written using async await like below:
+(async function () {
+  try {
+    const city = await whereAmI('pakistan');
+    console.log(`2. ${city}`);
+  } catch (err) {
+    console.error(`2.${err.message}`);
+  }
+  console.log(`3: finished execution`);
+})();
+*/
+// Promise ALL function 🦺
+// const getJSON = function (url, errorMsg = 'Something Went wrong ') {
+//   return fetch(url).then(response => {
+//     if (!response.ok) throw new Error(`${errorMsg} ${response.status}`);
+//     return response.json();
+//   });
+// };
+/*
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    //Here the ajax call is executed sequentially meaning that one ajax call waits for other to be finished, Hence taking a lot of time for execution.we can over come from this problem using Promise.all() where all the ajax are to be executed in parallel.Promise combinator function -> Promise.all() that runs multiple Promises at one time.
+    // const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
+    // const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    // const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    // console.log([data1.capital, data2.capital, data3.capital]);
+    const data = await Promise.all([
+      getJSON(`https://restcountries.com/v3.1/name/${c1}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c2}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c3}`),
+    ]);
+    data.map(d => console.log(d[0].capital));
+  } catch (err) {
+    console.error(err);
+  }
+};
+get3Countries('pakistan', 'canada', 'usa');
+
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setInterval(() => {
+      reject(new Error('Request took to long'));
+    }, 1000 * sec);
+  });
+};
+
+Promise.race([getJSON(`https://restcountries.com/v3.1/name/china`), timeout(5)])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+// Promise.allSettled
+Promise.allSettled([
+  Promise.resolve('done'),
+  Promise.reject('dana'),
+  Promise.resolve('done'),
+]).then(res => console.log(res));
+
+// Promise.any
+Promise.any([
+  Promise.resolve('done'),
+  Promise.reject('dana'),
+  Promise.resolve('done'),
+]).then(res => console.log(res));
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// Challenge 3
+/*
+// Utility function to create an image element and return a promise
+const createImage = function (imgPath) {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img');
+    img.src = imgPath;
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Failed to load image'));
+  });
+};
+
+// Utility function to wait for a given number of seconds
+const wait = function (seconds) {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+// Async function to load an image and pause
+const loadNPause = async function (path) {
+  try {
+    const img = await createImage(path);
+    document.body.appendChild(img); // Append the image to the DOM for visibility
+    console.log('Image loaded');
+    await wait(2); // Wait for 2 seconds
+    console.log('Waited for 2 seconds');
+    return img;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// Calling the async function and handling the result
+// (async function () {
+const imgs = loadNPause('./img/img-1.jpg');
+console.log(imgs);
+// })();
+// (async function () {
+//   const imgs = await loadNPause('./img/img-2.jpg');
+//   console.log(imgs);
+// })();
+// (async function () {
+//   const imgs = await loadNPause('./img/img-3.jpg');
+//   console.log(imgs);
+// })();
+
+*/
+
+// Joy Sahab Asynchronous JS
+let stocks = {
+  Fruits: ['strawberry', 'grapes', 'banana', 'apple'],
+  liquid: ['water', 'ice'],
+  holder: ['cone', 'cup', 'stick'],
+  toppings: ['chocolate', 'peanuts'],
+};
+let order = call_Production => {
+  console.log('Order placed. Please call production');
+  call_Production();
+};
+let production = () => {
+  console.log('Production has been Started');
+};
+
+order(production);
