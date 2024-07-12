@@ -574,42 +574,55 @@ Promise.any([
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Challenge 3
-/*
+const imgContainer = document.querySelector('.images');
+// let img;
 // Utility function to create an image element and return a promise
 const createImage = function (imgPath) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function (resolve, reject) {
     const img = document.createElement('img');
     img.src = imgPath;
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('Failed to load image'));
+
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
   });
 };
 
 // Utility function to wait for a given number of seconds
-const wait = function (seconds) {
-  return new Promise(resolve => {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
-
+// const wait = function (seconds) {
+//   return new Promise(resolve => {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+// let i = 1;
+// let imgs;
 // Async function to load an image and pause
-const loadNPause = async function (path) {
+//Part 2
+const loadAll = async function (imgPaths) {
   try {
-    const img = await createImage(path);
-    document.body.appendChild(img); // Append the image to the DOM for visibility
-    console.log('Image loaded');
-    await wait(2); // Wait for 2 seconds
-    console.log('Waited for 2 seconds');
-    return img;
+    // When map is used with an async function, it returns an array of promises.
+    const imgs = imgPaths.map(async img => await createImage(img));
+    console.log(imgs);
+
+    const imgEl = await Promise.all(imgs);
+    console.log(imgEl);
+
+    imgEl.forEach(img => img.classList.add('parallel'));
   } catch (error) {
-    console.error(error);
+    console.log('Error Occured.');
   }
 };
 
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
 // Calling the async function and handling the result
 // (async function () {
-const imgs = loadNPause('./img/img-1.jpg');
-console.log(imgs);
+// const imgs = loadNPause('./img/img-1.jpg');
+// console.log(imgs);
 // })();
 // (async function () {
 //   const imgs = await loadNPause('./img/img-2.jpg');
@@ -620,21 +633,147 @@ console.log(imgs);
 //   console.log(imgs);
 // })();
 
-*/
-
 // Joy Sahab Asynchronous JS
+/*
+// https://www.freecodecamp.org/news/javascript-async-await-tutorial-learn-callbacks-promises-async-await-by-making-icecream/
+
+let is_shop_open = true;
 let stocks = {
   Fruits: ['strawberry', 'grapes', 'banana', 'apple'],
   liquid: ['water', 'ice'],
   holder: ['cone', 'cup', 'stick'],
   toppings: ['chocolate', 'peanuts'],
 };
-let order = call_Production => {
-  console.log('Order placed. Please call production');
-  call_Production();
-};
-let production = () => {
-  console.log('Production has been Started');
+// let order = (fruit_name, call_production) => {
+//   // console.log('Order placed. Please call production');
+
+//   setTimeout(() => {
+//     console.log(`${stocks.Fruits[fruit_name]} was selected`);
+//     call_production();
+//   }, 2000);
+// };
+
+// let order = (time, work) => {
+//   return new Promise((resolve, reject) => {
+//     if (is_shop_open) {
+//       setTimeout(() => {
+//         //work is getting doen here
+//         resolve(work());
+//       }, time);
+//     } else {
+//       reject(console.log('out shop is closed'));
+//     }
+//   });
+// };
+
+//Call back Hell
+// let production = () => {
+//   setTimeout(() => {
+//     console.log('production has started');
+//     setTimeout(() => {
+//       console.log('The fruit has been chopped');
+//       setTimeout(() => {
+//         console.log(`${stocks.liquid[0]} and ${stocks.liquid[1]} Added`);
+//         setTimeout(() => {
+//           console.log('start the machine');
+//           setTimeout(() => {
+//             console.log(`Ice cream placed on ${stocks.holder[1]}`);
+//             setTimeout(() => {
+//               console.log(`${stocks.toppings[0]} as toppings`);
+//               setTimeout(() => {
+//                 console.log('serve Ice cream');
+//               }, 2000);
+//             }, 3000);
+//           }, 2000);
+//         }, 1000);
+//       }, 1000);
+//     }, 2000);
+//   }, 0);
+// };
+// Promises were invented to solve the problem of callback hell
+// order(0, production);
+// order(2000, () => console.log(`${stocks.Fruits[0]} was selected`));
+//    pass a ☝️ function here to start working
+
+// step 1
+// order(2000, () => console.log(`${stocks.Fruits[0]} was selected`))
+//   // step 2
+//   .then(() => {
+//     return order(0, () => console.log('production has started'));
+//   })
+
+//   // step 3
+//   .then(() => {
+//     return order(2000, () => console.log('Fruit has been chopped'));
+//   })
+
+//   // step 4
+//   .then(() => {
+//     return order(1000, () =>
+//       console.log(`${stocks.liquid[0]} and ${stocks.liquid[1]} added`)
+//     );
+//   })
+
+//   // step 5
+//   .then(() => {
+//     return order(1000, () => console.log('start the machine'));
+//   })
+
+//   // step 6
+//   .then(() => {
+//     return order(2000, () =>
+//       console.log(`ice cream placed on ${stocks.holder[1]}`)
+//     );
+//   })
+
+//   // step 7
+//   .then(() => {
+//     return order(3000, () => console.log(`${stocks.toppings[0]} as toppings`));
+//   })
+
+//   // Step 8
+//   .then(() => {
+//     return order(2000, () => console.log('Serve Ice Cream'));
+//   })
+//   .catch(() => {
+//     console.log('Customer left');
+//   })
+//   .finally(() => {
+//     console.log('end of day');
+//   });
+
+// Using Async /Await🧨🎊
+const time = function (ms) {
+  return new Promise(resolve => {
+    if (is_shop_open) {
+      setTimeout(resolve, ms);
+    } else {
+      console.log('Shop Is closed');
+    }
+  });
 };
 
-order(production);
+const kitchen = async function () {
+  try {
+    await time(2000);
+    console.log(`${stocks.Fruits[0]} was selected`);
+    await time(0);
+    console.log(`Production has Started`);
+    await time(2000);
+    console.log(`Fruit has been Chopped`);
+    await time(1000);
+    console.log(`${stocks.liquid[0]} and ${stocks.liquid[1]}`);
+    await time(1000);
+    console.log(`Start the Machine`);
+    await time(2000);
+    console.log(`Ice cream placed at ${stocks.holder[1]} `);
+    await time(3000);
+    console.log(`${stocks.toppings[0]} as toppings`);
+    await time(2000);
+    console.log(`Serve the Ice Cream`);
+  } catch (error) {
+    console.log('Customer left');
+  }
+};
+kitchen();
+*/
